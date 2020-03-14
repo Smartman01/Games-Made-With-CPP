@@ -10,7 +10,7 @@
 
 using namespace std;
 
-char **BOARD, PLAYER = 'x', AI = 'o';
+char **BOARD, AI1 = 'x', AI2 = 'o';
 
 void printRow(int row)
 {
@@ -63,7 +63,7 @@ bool checkRow(int row, char letter)
 		if (BOARD[row][i] != '*' && BOARD[row][i] == letter)
 			counter++;
 
-	return counter == 3 ? (true && cout << "\nPlayer " << letter << " wins\n") : false;
+	return counter == 3 ? (true && cout << "\nAI " << letter << " wins\n") : false;
 }
 
 bool checkCol(int col, char letter)
@@ -73,7 +73,7 @@ bool checkCol(int col, char letter)
 		if (BOARD[i][col] != '*' && BOARD[i][col] == letter)
 			counter++;
 
-	return counter == 3 ? (true && cout << "\nPlayer " << letter << " wins\n") : false;
+	return counter == 3 ? (true && cout << "\nAI " << letter << " wins\n") : false;
 }
 
 bool checkDiag(int row, char letter)
@@ -92,7 +92,7 @@ bool checkDiag(int row, char letter)
 				counter++;
 	}
 
-	return counter == 3 ? (true && cout << "\nPlayer " << letter << " wins\n") : false;
+	return counter == 3 ? (true && cout << "\nAI " << letter << " wins\n") : false;
 }
 
 bool checkTie()
@@ -109,15 +109,15 @@ bool checkTie()
 bool checkBOARD()
 {
 	for (int i = 0; i < 3; i++)
-		if (checkRow(i, PLAYER) || checkRow(i, AI))
+		if (checkRow(i, AI1) || checkRow(i, AI2))
 			return false;
 
 	for (int i = 0; i < 3; i++)
-		if (checkCol(i, PLAYER) || checkCol(i, AI))
+		if (checkCol(i, AI1) || checkCol(i, AI2))
 			return false;
 
-	if ((checkDiag(0, PLAYER) || checkDiag(2, PLAYER))
-		|| (checkDiag(0, AI) || checkDiag(2, AI)))
+	if ((checkDiag(0, AI1) || checkDiag(2, AI1))
+		|| (checkDiag(0, AI2) || checkDiag(2, AI2)))
 		return false;
 
 	if (checkTie())
@@ -126,9 +126,145 @@ bool checkBOARD()
 	return true;
 }
 
-void computerTurn()
+bool pickRow(int * arr, int row, char ai)
 {
-	int row, col;
+	if (BOARD[row][0] == BOARD[row][1] && BOARD[row][0] == ai)
+	{
+		if (checkPos(row, 2))
+		{
+			arr[0] = row;
+			arr[1] = 2;
+			return true;
+		}
+	}
+	else if (BOARD[row][1] == BOARD[row][2] && BOARD[row][1] == ai)
+	{
+		if (checkPos(row, 0))
+		{
+			arr[0] = row;
+			arr[1] = 0;
+			return true;
+		}
+	}
+	else if (BOARD[row][0] == BOARD[row][2] && BOARD[row][0] == ai)
+	{
+		if (checkPos(row, 1))
+		{
+			arr[0] = row;
+			arr[1] = 1;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool pickCol(int * arr, int col, char ai)
+{
+	if (BOARD[0][col] == BOARD[1][col] && BOARD[0][col] == ai)
+	{
+		if (checkPos(2, col))
+		{
+			arr[0] = 2;
+			arr[1] = col;
+			return true;
+		}
+	}
+	else if (BOARD[2][col] == BOARD[1][col] && BOARD[2][col] == ai)
+	{
+		if (checkPos(0, col))
+		{
+			arr[0] = 0;
+			arr[1] = col;
+			return true;
+		}
+	}
+	else if (BOARD[0][col] == BOARD[2][col] && BOARD[0][col] == ai)
+	{
+		if (checkPos(1, col))
+		{
+			arr[0] = 1;
+			arr[1] = col;
+			return true;
+		}
+	}
+	return false;
+}
+
+void pickDiag(int * arr, char ai)
+{
+	if (BOARD[0][0] == BOARD[1][1] && BOARD[0][0] == ai)
+	{
+		if (checkPos(2, 2))
+		{
+			arr[0] = 2;
+			arr[1] = 2;
+			return;
+		}
+	}
+	else if (BOARD[2][0] == BOARD[1][1] && BOARD[2][0] == ai)
+	{
+		if (checkPos(0, 2))
+		{
+			arr[0] = 0;
+			arr[1] = 2;
+			return;
+		}
+	}
+	else if (BOARD[2][2] == BOARD[1][1] && BOARD[2][2] == ai)
+	{
+		if (checkPos(0, 0))
+		{
+			arr[0] = 0;
+			arr[1] = 0;
+			return;
+		}
+	}
+	else if (BOARD[0][2] == BOARD[1][1] && BOARD[0][2] == ai)
+	{
+		if (checkPos(2, 2))
+		{
+			arr[0] = 2;
+			arr[1] = 2;
+			return;
+		}
+	}
+	else if ((BOARD[2][0] == BOARD[0][2] && BOARD[2][0] == ai)
+		|| (BOARD[0][0] == BOARD[2][2] && BOARD[0][0] == ai))
+	{
+		if (checkPos(1, 1))
+		{
+			arr[0] = 1;
+			arr[1] = 1;
+			return;
+		}
+	}
+}
+
+void pickPositions(int * arr, char ai)
+{
+	for (int i = 0; i < 3; i++)
+		if (pickRow(arr, i, ai))
+			return;
+
+	for (int i = 0; i < 3; i++)
+		if (pickCol(arr, i, ai))
+			return;
+	
+	pickDiag(arr, ai);
+}
+
+void computerTurnAI1()
+{
+	int arr[2] = { -1, -1 }, row, col;
+
+	pickPositions(arr, AI1);
+
+	if (arr[0] != -1)
+	{
+		cout << "\nTEST\n";
+		changeBOARD(arr[0], arr[1], AI1);
+		return;
+	}
 
 	srand(time(0));
 
@@ -141,22 +277,44 @@ void computerTurn()
 		col = rand() % 3;
 	}
 
-	changeBOARD(row, col, AI);
+	changeBOARD(row, col, AI1);
 }
 
+void computerTurnAI2()
+{
+	int arr[2] = { -1, -1 }, row, col;
+
+	pickPositions(arr, AI2);
+
+	if (arr[0] != -1)
+	{
+		cout << "\nTEST2\n";
+		changeBOARD(arr[0], arr[1], AI2);
+		return;
+	}
+
+	srand(time(0));
+
+	row = rand() % 3;
+	col = rand() % 3;
+
+	while (!checkPos(row, col))
+	{
+		row = rand() % 3;
+		col = rand() % 3;
+	}
+
+	changeBOARD(row, col, AI2);
+}
 
 int main()
 {
-	cout << "Tic Tac Toe Game vs AI Made with C++\n"
-		<< "\nIntstructions: Choose a number between 0 - 2"
-		<< "\nfor the row and column then press enter.\n"
-		<< "To end game press -1 and enter.\n";
+	cout << "Tic-Tac-Toe Game AI vs AI Made with C++\n"
+		<< "\nTo end game press -1 and enter.\n";
 
-	int num = 1, row, col;
+	int num = 1, row = -1, col = -1;
 
 	BOARD = new char*[3];
-
-	makeBOARD();
 
 	while (1)
 	{
@@ -165,26 +323,11 @@ int main()
 
 		if (num != -1)
 		{
+			makeBOARD();
+
 			while (checkBOARD())
 			{
-				cout << "\nChoose a row, column.\n";
-
-				cin >> row >> col;
-
-				if (checkPos(row, col))
-				{
-					changeBOARD(row, col, PLAYER);
-				}
-				else
-				{
-					cout << "\nPick a different position.\n";
-					continue;
-				}
-
-				if (!checkBOARD())
-					break;
-
-				cout << "\n AI's turn to pick ";
+				cout << "\nAI1's turn to pick ";
 
 				for (int i = 0; i < 3; i++)
 				{
@@ -194,12 +337,27 @@ int main()
 
 				cout << "\n";
 
-				computerTurn();
+				computerTurnAI1();
+
+				if (!checkBOARD())
+					break;
+
+				cout << "\nAI2's turn to pick ";
+
+				for (int i = 0; i < 3; i++)
+				{
+					cout << ".";
+					std::this_thread::sleep_for(std::chrono::seconds(1));
+				}
+
+				cout << "\n";
+
+				computerTurnAI2();
 			}
 		}
 
 		cout << "\nGame Ended!" << endl;
-		break;
+		
 	}
 
 	return 0;

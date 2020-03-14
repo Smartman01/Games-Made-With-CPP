@@ -14,5 +14,5 @@ Linux Bash Shell (LBS) Instructions:
     type g++ filename press enter, then type ./a.out and enter.
 
 Visual Studios (VS) Instructions:
-  - Open "filename".sln, which should open VS, once that is open pres ctrl + (and)
-    f5 together to start playing the game.
+  - Open "filename".sln for example, TicTacToe.sln , which should open VS, once 
+    that is open pres ctrl + (and) f5 together to start playing the game.

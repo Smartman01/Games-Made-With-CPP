@@ -7,6 +7,7 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
+#include <Windows.h>
 
 using namespace std;
 
@@ -16,17 +17,29 @@ void printRow(int row)
 {
 	for (int i = row; i < row + 1; i++)
 	{
-		cout << "|     |     |     |\n";
-		cout << "|";
+		cout << "      |     |      \n";
+		cout << " ";
 		for (int j = 0; j < 3; j++)
-			cout << "  " << BOARD[i][j] << "  |";
-		cout << "\n|_____|_____|_____|\n";
+		{
+			if (BOARD[i][j] == AI1)
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+			else if (BOARD[i][j] == AI2)
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+			cout << "  " << BOARD[i][j];
+
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+			if (j < 2)
+				cout << "  |";
+		}
+		if (i < 2)
+			cout << "\n _____|_____|_____ \n";
 	}
 }
 
 void printBOARD()
 {
-	cout << " _________________\n";
+	cout << "\n";
 
 	printRow(0);
 	printRow(1);
@@ -63,7 +76,7 @@ bool checkRow(int row, char letter)
 		if (BOARD[row][i] != '*' && BOARD[row][i] == letter)
 			counter++;
 
-	return counter == 3 ? (true && cout << "\nAI " << letter << " wins\n") : false;
+	return counter == 3 ? (true && cout << "\n\nAI " << letter << " wins\n") : false;
 }
 
 bool checkCol(int col, char letter)
@@ -73,7 +86,7 @@ bool checkCol(int col, char letter)
 		if (BOARD[i][col] != '*' && BOARD[i][col] == letter)
 			counter++;
 
-	return counter == 3 ? (true && cout << "\nAI " << letter << " wins\n") : false;
+	return counter == 3 ? (true && cout << "\n\nAI " << letter << " wins\n") : false;
 }
 
 bool checkDiag(int row, char letter)
@@ -92,7 +105,7 @@ bool checkDiag(int row, char letter)
 				counter++;
 	}
 
-	return counter == 3 ? (true && cout << "\nAI " << letter << " wins\n") : false;
+	return counter == 3 ? (true && cout << "\n\nAI " << letter << " wins\n") : false;
 }
 
 bool checkTie()
@@ -103,7 +116,7 @@ bool checkTie()
 		for (int j = 0; j < 3; j++)
 			if (BOARD[i][j] != '*')
 				counter++;
-	return counter == 9 ? (true && cout << "\nTie Game\n") : false;
+	return counter == 9 ? (true && cout << "\n\nTie Game\n") : false;
 }
 
 bool checkBOARD()
@@ -261,7 +274,6 @@ void computerTurnAI1()
 
 	if (arr[0] != -1)
 	{
-		cout << "\nTEST\n";
 		changeBOARD(arr[0], arr[1], AI1);
 		return;
 	}
@@ -288,7 +300,6 @@ void computerTurnAI2()
 
 	if (arr[0] != -1)
 	{
-		cout << "\nTEST2\n";
 		changeBOARD(arr[0], arr[1], AI2);
 		return;
 	}
@@ -327,7 +338,7 @@ int main()
 
 			while (checkBOARD())
 			{
-				cout << "\nAI1's turn to pick ";
+				cout << "\n\nAI1's turn to pick ";
 
 				for (int i = 0; i < 3; i++)
 				{
@@ -342,7 +353,7 @@ int main()
 				if (!checkBOARD())
 					break;
 
-				cout << "\nAI2's turn to pick ";
+				cout << "\n\nAI2's turn to pick ";
 
 				for (int i = 0; i < 3; i++)
 				{
